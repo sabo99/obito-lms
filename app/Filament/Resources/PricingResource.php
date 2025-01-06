@@ -6,6 +6,7 @@ use App\Filament\Resources\PricingResource\Pages;
 use App\Filament\Resources\PricingResource\RelationManagers;
 use App\Models\Pricing;
 use Filament\Forms;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -23,7 +24,32 @@ class PricingResource extends Resource
     {
         return $form
             ->schema([
-                //
+
+                Fieldset::make('Details')
+                    ->schema([
+                        //
+                        Forms\Components\TextInput::make('name')
+                            ->label('Name')
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder('Enter the name of the pricing'),
+
+                        Forms\Components\TextInput::make('price')
+                            ->label('Price')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->prefix('IDR')
+                            ->placeholder('Enter the price of the pricing'),
+
+                        Forms\Components\TextInput::make('duration')
+                            ->label('Duration')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->prefix('Month')
+                            ->placeholder('Enter the duration of the pricing'),
+                    ]),
             ]);
     }
 
@@ -31,7 +57,15 @@ class PricingResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('price')
+                    ->money('IDR')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('duration')
+                    ->suffix(' Month')
+                    ->searchable(),
+
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
