@@ -103,4 +103,16 @@ class Course extends Model
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
+
+    /**
+     * ================================
+     * Custom Methods
+     * ================================
+     */
+    public function getContentCountAttribute(): int
+    {
+        return $this->courseSections->sum(
+            fn(CourseSection $section) => $section->sectionContents->count()
+        );
+    }
 }

@@ -89,4 +89,25 @@ class User extends Authenticatable
     {
         return $this->hasMany(Transaction::class, 'user_id');
     }
+
+    /**
+     * ================================
+     * Custom Methods
+     * ================================
+     */
+    public function getActiveSubscription(): ?Transaction
+    {
+        return $this->transactions()
+            ->where('is_paid', true)
+            ->where('ended_at', '>=', now())
+            ->first();
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        return $this->transactions()
+            ->where('is_paid', true)
+            ->where('ended_at', '>=', now())
+            ->exists();
+    }
 }
