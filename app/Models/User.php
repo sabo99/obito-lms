@@ -21,6 +21,8 @@ use Illuminate\Notifications\Notifiable;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Transaction> $transactions
+ * @property-read int|null $transactions_count
  *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
@@ -88,5 +90,26 @@ class User extends Authenticatable
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class, 'user_id');
+    }
+
+    /**
+     * ================================
+     * Custom Methods
+     * ================================
+     */
+    public function getActiveSubscription(): ?Transaction
+    {
+        return $this->transactions()
+            ->where('is_paid', true)
+            ->where('ended_at', '>=', now())
+            ->first();
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        return $this->transactions()
+            ->where('is_paid', true)
+            ->where('ended_at', '>=', now())
+            ->exists();
     }
 }

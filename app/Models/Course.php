@@ -28,6 +28,7 @@ use Illuminate\Support\Str;
  * @property-read int|null $course_sections_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CourseStudent> $courseStudents
  * @property-read int|null $course_students_count
+ * @property-read int $content_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newQuery()
@@ -102,5 +103,17 @@ class Course extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    /**
+     * ================================
+     * Custom Methods
+     * ================================
+     */
+    public function getContentCountAttribute(): int
+    {
+        return $this->courseSections->sum(
+            fn (CourseSection $section) => $section->sectionContents->count()
+        );
     }
 }
