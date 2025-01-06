@@ -23,7 +23,45 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\TextInput::make('name')
+                    ->label('Name')
+                    ->required()
+                    ->maxLength(255)
+                    ->placeholder('John Doe'),
+
+                Forms\Components\TextInput::make('email')
+                    ->label('Email')
+                    ->required()
+                    ->email()
+                    ->maxLength(255),
+
+                Forms\Components\TextInput::make('password')
+                    ->required()
+                    ->password()
+                    ->minLength(9)
+                    ->maxLength(255)
+                    ->helperText('Minimum of 9 characters'),
+
+                Forms\Components\Select::make('occupation')
+                    ->label('Occupation')
+                    ->options([
+                        'Software Engineer' => 'Software Engineer',
+                        'Designer' => 'Designer',
+                        'Product Manager' => 'Product Manager',
+                        'Data Scientist' => 'Data Scientist',
+                        'Other' => 'Other',
+                    ])
+                    ->required()
+                    ->placeholder('Select the occupation'),
+
+                Forms\Components\Select::make('role')
+                    ->label('Role')
+                    ->relationship('roles', 'name')
+                    ->required(),
+
+                Forms\Components\FileUpload::make('photo')
+                    ->image()
+                    ->required()
             ]);
     }
 
@@ -31,7 +69,10 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\ImageColumn::make('photo'),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('roles.name'),
             ])
             ->filters([
                 // Tables\Filters\TrashedFilter::make(),
