@@ -11,8 +11,8 @@ use Illuminate\Notifications\Notifiable;
 /**
  * @property int $id
  * @property string $name
- * @property string $photo
- * @property string $occupation
+ * @property string|null $photo
+ * @property string|null $occupation
  * @property string $email
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property string $password
