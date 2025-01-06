@@ -102,7 +102,6 @@ class Transaction extends Model
      * Custom Methods
      * ================================
      */
-
     public function isActive(): bool
     {
         return $this->is_paid && $this->ended_at->isFuture();
