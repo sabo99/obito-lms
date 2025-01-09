@@ -3,9 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CourseMentorResource\Pages;
-use App\Filament\Resources\CourseMentorResource\RelationManagers;
 use App\Models\CourseMentor;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
