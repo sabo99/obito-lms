@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PricingResource\Pages;
-use App\Filament\Resources\PricingResource\RelationManagers;
 use App\Models\Pricing;
 use Filament\Forms;
 use Filament\Forms\Components\Fieldset;

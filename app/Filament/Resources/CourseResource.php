@@ -6,6 +6,7 @@ use App\Filament\Resources\CourseResource\Pages;
 use App\Filament\Resources\CourseResource\RelationManagers;
 use App\Models\Course;
 use Filament\Forms;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -24,6 +25,41 @@ class CourseResource extends Resource
         return $form
             ->schema([
                 //
+                Fieldset::make('Course Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Name')
+                            ->maxLength(255),
+                        Forms\Components\FileUpload::make('thumbnail')
+                            ->label('Image')
+                            ->image()
+                            ->required(),
+                    ]),
+
+                Fieldset::make('Additional')
+                    ->schema([
+                        Forms\Components\Repeater::make('benefits')
+                            ->relationship('benefits')
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Name')
+                                    ->maxLength(255),
+                            ]),
+                        Forms\Components\Textarea::make('about')
+                            ->required(),
+                        Forms\Components\Select::make('is_popular')
+                            ->options([
+                                true => 'Popular',
+                                false => 'Not Popular',
+                            ])
+                            ->required(),
+                        Forms\Components\Select::make('category_id')
+                            ->label('Category')
+                            ->relationship('category', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                    ]),
             ]);
     }
 
@@ -31,7 +67,17 @@ class CourseResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\ImageColumn::make('thumbnail'),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('category.name'),
+                Tables\Columns\IconColumn::make('is_popular')
+                    ->boolean()
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->label('Popular'),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -51,7 +97,8 @@ class CourseResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\CourseSectionsRelationManager::class,
+            RelationManagers\CourseTestimonialsRelationManager::class,
         ];
     }
 

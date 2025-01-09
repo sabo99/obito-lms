@@ -28,6 +28,8 @@ use Illuminate\Support\Str;
  * @property-read int|null $course_sections_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CourseStudent> $courseStudents
  * @property-read int|null $course_students_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CourseTestimonial> $courseTestimonials
+ * @property-read int|null $course_testimonials_count
  * @property-read int $content_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newModelQuery()
@@ -88,6 +90,11 @@ class Course extends Model
     public function courseSections(): HasMany
     {
         return $this->hasMany(CourseSection::class, 'course_id');
+    }
+
+    public function courseTestimonials(): HasMany
+    {
+        return $this->hasMany(CourseTestimonial::class, 'course_id');
     }
 
     public function courseStudents(): HasMany
