@@ -31,8 +31,8 @@ class CourseMentorResource extends Resource
                 Forms\Components\Select::make('user_id')
                     ->label('Mentor')
                     ->options(
-                        fn() => \App\Models\User::all(['name', 'id', 'occupation'])
-                            ->mapWithKeys(fn($user) => [
+                        fn () => \App\Models\User::all(['name', 'id', 'occupation'])
+                            ->mapWithKeys(fn ($user) => [
                                 $user->id => "$user->name ({$user->occupation})",
                             ])
                     )

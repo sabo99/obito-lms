@@ -3,8 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TransactionResource\Pages;
+use App\Models\Pricing;
 use App\Models\Transaction;
+use App\Models\User;
+use Carbon\Carbon;
+use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -21,7 +27,153 @@ class TransactionResource extends Resource
     {
         return $form
             ->schema([
-                //
+
+                Forms\Components\Wizard::make([
+                    Forms\Components\Wizard\Step::make('Product and Price')
+                        ->schema([
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\Select::make('pricing_id')
+                                        ->relationship('pricing', 'name')
+                                        ->searchable()
+                                        ->preload()
+                                        ->required()
+                                        ->live()
+                                        ->afterStateUpdated(function (Set $set, ?string $state) {
+                                            $pricing = Pricing::find($state);
+
+                                            $price = $pricing->price;
+                                            $duration = $pricing->duration;
+
+                                            $subTotal = $price * $state;
+                                            $totalPpn = $subTotal * 0.11;
+                                            $totalAmount = $subTotal + $totalPpn;
+
+                                            $set('sub_total_amount', $subTotal);
+                                            $set('total_tax_amount', $totalPpn);
+                                            $set('grand_total_amount', $totalAmount);
+                                            $set('duration', $duration);
+                                            $set('started_at', null);
+                                            $set('ended_at', null);
+                                        })
+                                        ->afterStateHydrated(function ($state, Set $set) {
+                                            $pricingId = $state;
+                                            if ($pricingId) {
+                                                $pricing = Pricing::find($pricingId);
+                                                $duration = $pricing->duration;
+                                                $set('duration', $duration);
+                                            }
+                                        }),
+                                    Forms\Components\TextInput::make('duration')
+                                        ->numeric()
+                                        ->required()
+                                        ->readOnly()
+                                        ->prefix('Months'),
+                                ]),
+
+                            Forms\Components\Grid::make(3)
+                                ->schema([
+                                    Forms\Components\TextInput::make('sub_total_amount')
+                                        ->numeric()
+                                        ->required()
+                                        ->readOnly()
+                                        ->prefix('IDR'),
+                                    Forms\Components\TextInput::make('total_tax_amount')
+                                        ->numeric()
+                                        ->required()
+                                        ->readOnly()
+                                        ->prefix('IDR'),
+                                    Forms\Components\TextInput::make('grand_total_amount')
+                                        ->numeric()
+                                        ->required()
+                                        ->readOnly()
+                                        ->prefix('IDR')
+                                        ->helperText('Harga sudah termasuk PPN 11%'),
+                                ]),
+
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('started_at')
+                                        ->required()
+                                        ->live()
+                                        ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                            $duration = $get('duration');
+                                            if ($state && $duration) {
+                                                $endedAt = Carbon::parse($state)->addMonths($duration);
+                                                $set('ended_at', $endedAt->format('Y-m-d'));
+                                            }
+                                        }),
+
+                                    Forms\Components\DatePicker::make('ended_at')
+                                        ->readOnly()
+                                        ->required(),
+                                ]),
+
+                        ]),
+
+                    Forms\Components\Wizard\Step::make('Customer Information')
+                        ->schema([
+                            Forms\Components\Select::make('user_id')
+                                ->relationship('student', 'email')
+                                ->searchable()
+                                ->preload()
+                                ->required()
+                                ->live()
+                                ->afterStateUpdated(function (Set $set, ?string $state) {
+                                    $user = User::find($state);
+
+                                    $name = $user->name;
+                                    $email = $user->email;
+
+                                    $set('name', $name);
+                                    $set('email', $email);
+                                })
+                                ->afterStateHydrated(function ($state, Set $set) {
+                                    $userId = $state;
+                                    if ($userId) {
+                                        $user = User::find($userId);
+                                        $name = $user->name;
+                                        $email = $user->email;
+                                        $set('name', $name);
+                                        $set('email', $email);
+                                    }
+                                }),
+                            Forms\Components\TextInput::make('name')
+                                ->maxLength(255)
+                                ->required()
+                                ->readOnly(),
+                            Forms\Components\TextInput::make('email')
+                                ->maxLength(255)
+                                ->required()
+                                ->readOnly(),
+                        ]),
+
+                    Forms\Components\Wizard\Step::make('Payment Information')
+                        ->schema([
+                            Forms\Components\ToggleButtons::make('is_paid')
+                                ->label('Payment Status')
+                                ->boolean()
+                                ->grouped()
+                                ->icons([
+                                    true => 'heroicon-o-pencil',
+                                    false => 'heroicon-o-clock',
+                                ])
+                                ->required(),
+
+                            Forms\Components\Select::make('payment_type')
+                                ->options([
+                                    'Manual' => 'Manual',
+                                    'Midtrans' => 'Midtrans',
+                                ])
+                                ->required(),
+
+                            Forms\Components\FileUpload::make('payment_proof')
+                                ->image(),
+                        ]),
+                ])
+                    ->columnSpanFull()
+                    ->columns(1)
+                    ->skippable(),
             ]);
     }
 
