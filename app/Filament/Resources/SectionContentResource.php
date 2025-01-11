@@ -19,6 +19,8 @@ class SectionContentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Products';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -26,9 +28,9 @@ class SectionContentResource extends Resource
                 Forms\Components\Select::make('course_section_id')
                     ->label('Course Section')
                     ->options(
-                        fn () => CourseSection::with('course')
+                        fn() => CourseSection::with('course')
                             ->get()
-                            ->mapWithKeys(fn ($courseSection) => [
+                            ->mapWithKeys(fn($courseSection) => [
                                 $courseSection->id => $courseSection->course
                                     ? "{$courseSection->course->name} - {$courseSection->name}"
                                     : $courseSection->name,
