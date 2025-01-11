@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CourseMentorResource\Pages;
 use App\Models\CourseMentor;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -17,11 +18,39 @@ class CourseMentorResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Products';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Select::make('course_id')
+                    ->relationship('course', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+
+                Forms\Components\Select::make('user_id')
+                    ->label('Mentor')
+                    ->options(
+                        fn () => \App\Models\User::all(['name', 'id', 'occupation'])
+                            ->mapWithKeys(fn ($user) => [
+                                $user->id => "$user->name ({$user->occupation})",
+                            ])
+                    )
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+
+                Forms\Components\Textarea::make('about')
+                    ->required(),
+
+                Forms\Components\Select::make('is_active')
+                    ->options([
+                        true => 'Active',
+                        false => 'Banned',
+                    ])
+                    ->required(),
             ]);
     }
 
@@ -29,7 +58,14 @@ class CourseMentorResource extends Resource
     {
         return $table
             ->columns([
-                //
+
+                Tables\Columns\ImageColumn::make('mentor.photo'),
+                Tables\Columns\TextColumn::make('mentor.name')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('course.name')
+                    ->sortable()
+                    ->searchable(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),

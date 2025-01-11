@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('course_section_id')->constrained('course_sections')->cascadeOnDelete();
             $table->string('name');
-            $table->text('content');
+            $table->longText('content');
             $table->timestamps();
             $table->softDeletes();
         });

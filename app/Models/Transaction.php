@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\TransactionObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -49,6 +51,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @mixin \Eloquent
  */
+#[ObservedBy([TransactionObserver::class])]
 class Transaction extends Model
 {
     use SoftDeletes;
