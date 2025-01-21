@@ -20,12 +20,14 @@ Route::middleware(['auth', 'role:student'])
         Route::get('/courses/search/courses', [CourseController::class, 'searchCourses'])
             ->name('courses.search');
 
-        Route::middleware('check.subscription')->group(function () {
+        Route::middleware(['check.subscription'])->group(function () {
 
             Route::get('/join/{course:slug}', [CourseController::class, 'join'])
                 ->name('courses.join');
+
             Route::get('/learning/{course:slug}/{courseSection}/{sectionContent}', [CourseController::class, 'learning'])
                 ->name('courses.learning');
+
             Route::get('/learning/{course:slug}/finished', [CourseController::class, 'learningFinished'])
                 ->name('courses.learning.finished');
         });
