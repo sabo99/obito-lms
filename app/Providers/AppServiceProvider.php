@@ -15,6 +15,10 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\PricingRepositoryInterface::class,
             \App\Repositories\PricingRepository::class
         );
+        $this->app->singleton(
+            \App\Repositories\Course\CourseRepositoryInterface::class,
+            \App\Repositories\Course\CourseRepository::class
+        );
     }
 
     /**
