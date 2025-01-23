@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Collection;
 class TransactionRepository implements TransactionRepositoryInterface
 {
     /**
-     * Create a new class instance.
+     * TransactionRepository constructor.
+     *
+     * Initializes the TransactionRepository class.
      */
     public function __construct(
         protected Transaction $transaction

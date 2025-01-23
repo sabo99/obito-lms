@@ -44,7 +44,7 @@ class PricingRepository implements PricingRepositoryInterface
     {
         $pricing = $this->findById($pricingId);
 
-        return $pricing->transactions()
+        return $pricing?->transactions()
             ->where('user_id', $userId)
             ->where('is_paid', true)
             ->where('ended_at', '>=', now())
